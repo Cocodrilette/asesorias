@@ -1,9 +1,9 @@
 const express = require("express");
-const app = express();
 const fs = require("fs");
-const port = 3000;
+require("dotenv").config();
 
-const { products } = require("./products.json");
+const app = express();
+const port = 3000;
 
 app.use(express.json());
 
@@ -19,6 +19,7 @@ app.get("/about", (req, res) => {
 
 // GET http://localhost:3000/product
 app.get("/products", (req, res) => {
+  const { products } = require("./products.json");
   res.json(products);
 });
 
@@ -135,6 +136,21 @@ app.delete("/products/:id", (req, res) => {
   res.send({
     message: "Product updated successfully",
     product: { id: db.products[productIdx].id, name, price },
+  });
+});
+
+// GET http://localhost:3000/secret-message
+app.get("/secret-message", (req, res) => {
+  const apiKey = req.headers["x-api-key"];
+
+  if (apiKey !== process.env.SECRET_KEY) {
+    return res.status(401).json({
+      message: "You are not authorized to access this route",
+    });
+  }
+
+  res.json({
+    message: "Authorized",
   });
 });
 
